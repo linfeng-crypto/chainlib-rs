@@ -1,5 +1,4 @@
 use crate::key_service::KeyService;
-use crate::types::address::Address;
 use crate::types::basic::{Amount, Denom, Fee, SyncMode};
 use crate::types::signature::Signature;
 use crate::types::transaction::{Transaction, Transfer, Tx};
@@ -7,6 +6,7 @@ use crate::utils::codec::serde_to_str;
 
 use anyhow::Error;
 use serde::Serialize;
+use stdtx::Address;
 
 pub struct TransferBuilder {
     pub fee: Amount,
@@ -123,6 +123,7 @@ impl TransferBuilder {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::config::ACCOUNT_ADDRESS_PREFIX;
     use crate::hd_wallet::mnemonic::Mnemonic;
     use crate::types::basic::Amount;
     use crate::types::key::PublicKey;
@@ -138,8 +139,11 @@ mod test {
         let key_service = KeyService::new_from_mnemonic(mnemonic).unwrap();
         let chain_id = "test".to_string();
         let mut builder = TransferBuilder::new(fee.clone(), gas, memo, key_service, chain_id);
-        let to_address = Address::from_cro("cro1s2gsnugjhpzac8m7necv3527jp28z9w002najd").unwrap();
-        builder.add_transfer(100000000, Denom::Basecro, to_address.clone()).unwrap();
+        let (_, to_address) =
+            Address::from_bech32("cro1s2gsnugjhpzac8m7necv3527jp28z9w002najd").unwrap();
+        builder
+            .add_transfer(100000000, Denom::Basecro, to_address.clone())
+            .unwrap();
         let account_number = 0;
         let sequence = 0;
         let transfer = builder
@@ -165,7 +169,7 @@ mod test {
                         transfer_type: "cosmos-sdk/MsgSend".into(),
                         value: TransferValue {
                             from_address: "cro1u9q8mfpzhyv2s43js7l5qseapx5kt3g2rf7ppf".into(),
-                            to_address: to_address.to_cro().unwrap(),
+                            to_address: to_address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
                             amount: vec![Amount::new(100000000, Denom::Basecro)],
                         }
                     }

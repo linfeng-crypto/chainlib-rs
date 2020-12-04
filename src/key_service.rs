@@ -1,11 +1,11 @@
-use crate::types::address::{Address, HASH_SIZE_ADDRESS};
+use crate::hd_wallet::mnemonic::Mnemonic;
 use crate::types::key::{PrivateKey, PublicKey};
 
-use crate::hd_wallet::mnemonic::Mnemonic;
 use anyhow::Error;
 use bitcoin_hashes::{ripemd160, sha256};
 use bitcoin_hashes::{Hash, HashEngine};
 use secp256k1::Message;
+use stdtx::address::{Address, ADDRESS_SIZE};
 
 pub struct KeyService {
     pub private_key: PrivateKey,
@@ -36,12 +36,11 @@ impl KeyService {
         let mut engine = ripemd160::Hash::engine();
         engine.input(sha.as_inner());
         let raw = ripemd160::Hash::from_engine(engine);
-        let raw = raw.into_inner();
-        let bits = bech32::convert_bits(&raw, 8, 5, true)?;
-        if bits.len() != HASH_SIZE_ADDRESS {
+        let bits = raw.into_inner();
+        if bits.len() != ADDRESS_SIZE {
             return Err(Error::msg("invalid bits length to generate address"));
         }
-        let mut raw = [0; HASH_SIZE_ADDRESS];
+        let mut raw = [0; ADDRESS_SIZE];
         raw.copy_from_slice(&bits);
         Ok(raw.into())
     }
@@ -62,6 +61,7 @@ impl KeyService {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::config::ACCOUNT_ADDRESS_PREFIX;
 
     #[test]
     fn test_hd_key() {
@@ -72,7 +72,7 @@ mod test {
         // test address
         let address = key_service.address().unwrap();
         assert_eq!(
-            address.to_cro().unwrap(),
+            address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
             "cro1u9q8mfpzhyv2s43js7l5qseapx5kt3g2rf7ppf"
         );
 

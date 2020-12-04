@@ -1,8 +1,10 @@
-use crate::types::address::{Address, CroAddressError};
 use crate::types::basic::{Amount, Denom, Fee, SyncMode};
 use crate::types::signature::Signature;
 
+use crate::config::ACCOUNT_ADDRESS_PREFIX;
+use anyhow::Error;
 use serde::Serialize;
+use stdtx::Address;
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct TransferValue {
@@ -12,14 +14,10 @@ pub struct TransferValue {
 }
 
 impl TransferValue {
-    pub fn new(
-        from_address: Address,
-        to_address: Address,
-        amount: Amount,
-    ) -> Result<Self, CroAddressError> {
+    pub fn new(from_address: Address, to_address: Address, amount: Amount) -> Result<Self, Error> {
         Ok(Self {
-            from_address: from_address.to_cro()?,
-            to_address: to_address.to_cro()?,
+            from_address: from_address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
+            to_address: to_address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
             amount: vec![amount],
         })
     }
@@ -37,7 +35,7 @@ impl Transfer {
         to_address: Address,
         amount: u64,
         denom: Denom,
-    ) -> Result<Self, CroAddressError> {
+    ) -> Result<Self, Error> {
         let amount = Amount::new(amount, denom);
         let transfer_value = TransferValue::new(from_address.into(), to_address.into(), amount)?;
         Ok(Self {
