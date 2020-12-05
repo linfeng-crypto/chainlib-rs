@@ -3,7 +3,7 @@ use hdwallet::ExtendedPrivKey;
 use secp256k1::rand::Rng;
 use secp256k1::{All, Secp256k1};
 use secp256k1::{Error as SecpError, PublicKey as InnerPublicKey, SecretKey};
-use serde::{Serialize, Serializer};
+use serde::Serialize;
 use std::string::ToString;
 
 #[derive(Debug, Clone)]
@@ -12,19 +12,25 @@ pub struct PrivateKey(SecretKey);
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PublicKey(InnerPublicKey);
 
-impl AsRef<SecretKey> for PrivateKey {
-    fn as_ref(&self) -> &SecretKey {
-        &self.0
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct PublicKeyWrap {
+    #[serde(rename = "type")]
+    p_type: String,
+    value: String,
+}
+
+impl From<PublicKey> for PublicKeyWrap {
+    fn from(pubkey: PublicKey) -> PublicKeyWrap {
+        Self {
+            p_type: "tendermint/PubKeySecp256k1".to_string(),
+            value: pubkey.to_string(),
+        }
     }
 }
 
-impl Serialize for PublicKey {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let s = self.to_string();
-        serializer.serialize_str(&s)
+impl AsRef<SecretKey> for PrivateKey {
+    fn as_ref(&self) -> &SecretKey {
+        &self.0
     }
 }
 

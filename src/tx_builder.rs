@@ -56,7 +56,6 @@ impl TransferBuilder {
         denom: Denom,
         to_address: Address,
     ) -> Result<(), Error> {
-        // TODO: fix error
         let from_address = self.key_service.address()?;
         let transfer = Transfer::new(from_address, to_address, amount, denom)
             .map_err(|_e| Error::msg("create transfer failed"))?;
@@ -90,7 +89,7 @@ impl TransferBuilder {
 
         let signature = Signature {
             signature,
-            pub_key: self.key_service.public_key(),
+            pub_key: self.key_service.public_key().into(),
             account_number,
             sequence,
         };

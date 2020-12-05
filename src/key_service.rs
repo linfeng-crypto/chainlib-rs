@@ -7,6 +7,7 @@ use bitcoin_hashes::{Hash, HashEngine};
 use secp256k1::Message;
 use stdtx::address::{Address, ADDRESS_SIZE};
 
+#[derive(Clone)]
 pub struct KeyService {
     pub private_key: PrivateKey,
 }
