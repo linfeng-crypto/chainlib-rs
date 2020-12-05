@@ -19,3 +19,12 @@ bitcoin_hashes = "0.9"
 rand = "0.7"
 base64 = "0.13"
 stdtx = {version = "0.4.0-pre", features = ["amino"] }
+
+[[example]]
+name = "example"
+path = "example/example.rs"
+
+
+[dev-dependencies]
+reqwest = {version  = "0.10.9", features = ["json"] }
+tokio = { verison = "0.2", features = ["full"] }
