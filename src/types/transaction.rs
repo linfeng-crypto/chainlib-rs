@@ -2,7 +2,7 @@ use crate::types::basic::{Amount, Denom, Fee, SyncMode};
 use crate::types::signature::Signature;
 
 use crate::config::ACCOUNT_ADDRESS_PREFIX;
-use anyhow::Error;
+use crate::error::Error;
 use serde::Serialize;
 use stdtx::Address;
 

@@ -1,7 +1,7 @@
+use crate::error::Error;
 use crate::hd_wallet::mnemonic::Mnemonic;
 use crate::types::key::{PrivateKey, PublicKey};
 
-use anyhow::Error;
 use bitcoin_hashes::{ripemd160, sha256};
 use bitcoin_hashes::{Hash, HashEngine};
 use secp256k1::Message;
@@ -39,7 +39,9 @@ impl KeyService {
         let raw = ripemd160::Hash::from_engine(engine);
         let bits = raw.into_inner();
         if bits.len() != ADDRESS_SIZE {
-            return Err(Error::msg("invalid bits length to generate address"));
+            return Err(Error::InputError(
+                "invalid bits length to generate address".to_string(),
+            ));
         }
         let mut raw = [0; ADDRESS_SIZE];
         raw.copy_from_slice(&bits);
