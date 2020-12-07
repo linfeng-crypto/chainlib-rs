@@ -1,10 +1,10 @@
+use crate::error::Error;
 use crate::key_service::KeyService;
 use crate::types::basic::{Amount, Denom, Fee, SyncMode};
 use crate::types::signature::Signature;
 use crate::types::transaction::{Transaction, Transfer, Tx};
 use crate::utils::codec::serde_to_str;
 
-use anyhow::Error;
 use serde::Serialize;
 use stdtx::Address;
 
@@ -57,8 +57,7 @@ impl TransferBuilder {
         to_address: Address,
     ) -> Result<(), Error> {
         let from_address = self.key_service.address()?;
-        let transfer = Transfer::new(from_address, to_address, amount, denom)
-            .map_err(|_e| Error::msg("create transfer failed"))?;
+        let transfer = Transfer::new(from_address, to_address, amount, denom)?;
         self.transfers.push(transfer);
         Ok(())
     }
@@ -81,7 +80,8 @@ impl TransferBuilder {
             fee,
             msgs: self.transfers.clone(),
         };
-        let value = serde_json::to_value(&sign_msg)?;
+        let value =
+            serde_json::to_value(&sign_msg).map_err(|e| Error::SerializeError(e.to_string()))?;
         let sign_str = sorted_json::to_json(&value)
             .replace("\n", "")
             .replace(" ", "");
@@ -158,7 +158,7 @@ mod test {
                 signatures: vec![
                     Signature {
                         signature: "xi3rvdsoZMXhWq7MlgAMXpoVIZ0kv7uB00OrSRS8wxwoZhojZ5uGZ4shobn3ztOev4M1k5WVcBvVd+zTvzRHCg==".into(),
-                        pub_key: PublicKey::from_base64_str("AntL+UxMyJ9NZ9DGLp2v7a3dlSxiNXMaItyOXSRw8iYi").unwrap(),
+                        pub_key: PublicKey::from_base64_str("AntL+UxMyJ9NZ9DGLp2v7a3dlSxiNXMaItyOXSRw8iYi").unwrap().into(),
                         account_number,
                         sequence,
                     }

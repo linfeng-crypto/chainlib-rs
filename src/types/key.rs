@@ -1,4 +1,4 @@
-use anyhow::Error;
+use crate::error::Error;
 use hdwallet::ExtendedPrivKey;
 use secp256k1::rand::Rng;
 use secp256k1::{All, Secp256k1};
@@ -48,7 +48,8 @@ impl PrivateKey {
 
 impl PublicKey {
     pub fn from_base64_str(pubkey_str: &str) -> Result<Self, Error> {
-        let raw = base64::decode(pubkey_str)?;
+        let raw = base64::decode(pubkey_str)
+            .map_err(|_e| Error::InputError("invalid publickey input".to_string()))?;
         let inner = InnerPublicKey::from_slice(&raw)?;
         Ok(Self(inner))
     }
