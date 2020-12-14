@@ -70,7 +70,7 @@ impl KeyService {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::config::ACCOUNT_ADDRESS_PREFIX;
+    use crate::constant::ACCOUNT_ADDRESS_PREFIX;
 
     #[test]
     fn test_hd_key() {

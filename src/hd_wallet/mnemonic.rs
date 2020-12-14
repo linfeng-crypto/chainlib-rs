@@ -1,6 +1,6 @@
 use crate::types::key::PrivateKey;
 
-use crate::config::FUNDRAISER_PATH;
+use crate::constant::FUNDRAISER_PATH;
 use bip39::{Language, MnemonicType, Seed};
 use hdwallet::{ChainPath, KeyChain};
 use hdwallet::{DefaultKeyChain, ExtendedPrivKey};

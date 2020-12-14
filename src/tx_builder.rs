@@ -122,7 +122,7 @@ impl TransferBuilder {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::config::ACCOUNT_ADDRESS_PREFIX;
+    use crate::constant::ACCOUNT_ADDRESS_PREFIX;
     use crate::hd_wallet::mnemonic::Mnemonic;
     use crate::types::basic::Amount;
     use crate::types::key::PublicKey;
