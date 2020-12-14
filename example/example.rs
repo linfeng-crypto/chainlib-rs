@@ -1,5 +1,5 @@
 use anyhow::Error;
-use cro_sign_tool::config::ACCOUNT_ADDRESS_PREFIX;
+use cro_sign_tool::constant::ACCOUNT_ADDRESS_PREFIX;
 use cro_sign_tool::hd_wallet::mnemonic::Mnemonic;
 use cro_sign_tool::key_service::KeyService;
 use cro_sign_tool::tx_builder::TransferBuilder;

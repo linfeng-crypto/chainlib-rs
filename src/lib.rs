@@ -1,4 +1,4 @@
-pub mod config;
+pub mod constant;
 pub mod error;
 pub mod hd_wallet;
 pub mod key_service;
