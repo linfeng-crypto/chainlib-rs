@@ -6,6 +6,7 @@ use crate::error::Error;
 use serde::Serialize;
 use stdtx::Address;
 
+/// the value in Transfer
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct TransferValue {
     pub from_address: String,
@@ -14,6 +15,7 @@ pub struct TransferValue {
 }
 
 impl TransferValue {
+    /// create a new TransferValue
     pub fn new(from_address: Address, to_address: Address, amount: Amount) -> Result<Self, Error> {
         Ok(Self {
             from_address: from_address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
@@ -22,6 +24,8 @@ impl TransferValue {
         })
     }
 }
+
+/// the message in Tx
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct Transfer {
     #[serde(rename = "type")]
@@ -30,6 +34,7 @@ pub struct Transfer {
 }
 
 impl Transfer {
+    /// create a new transfer
     pub fn new(
         from_address: Address,
         to_address: Address,
@@ -45,6 +50,7 @@ impl Transfer {
     }
 }
 
+/// tx in transfer transaction
 #[derive(Serialize, Clone, Debug, PartialEq, Eq)]
 pub struct Tx {
     #[serde(rename = "msg")]
@@ -54,6 +60,7 @@ pub struct Tx {
     pub signatures: Vec<Signature>,
 }
 
+/// transfer transaction
 #[derive(Serialize, Clone, Debug, PartialEq, Eq)]
 pub struct Transaction {
     pub tx: Tx,

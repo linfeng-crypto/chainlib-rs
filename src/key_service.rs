@@ -7,27 +7,32 @@ use bitcoin_hashes::{Hash, HashEngine};
 use secp256k1::Message;
 use stdtx::address::{Address, ADDRESS_SIZE};
 
+
+/// stores private key
 #[derive(Clone)]
 pub struct KeyService {
     pub private_key: PrivateKey,
 }
 
 impl KeyService {
+    /// create a new KeyService from Mnemonic
     pub fn new_from_mnemonic(mnemonic: Mnemonic) -> Result<Self, Error> {
         let private_key = mnemonic.private_key()?;
         Ok(Self { private_key })
     }
 
+    /// create a new KeyService from a PrivateKey
     pub fn new(private_key: PrivateKey) -> Self {
         Self { private_key }
     }
 
+    /// return the public key
     #[inline]
     pub fn public_key(&self) -> PublicKey {
         PublicKey::from(&self.private_key)
     }
 
-    /// Address returns a Bitcoin style addresses: RIPEMD160(SHA256(pubkey))
+    /// Address returns a Bitcoin style account addresses: RIPEMD160(SHA256(pubkey))
     pub fn address(&self) -> Result<Address, Error> {
         let pubkey = PublicKey::from(&self.private_key);
         let pubkey_bytes = pubkey.as_ref().serialize();
@@ -48,6 +53,7 @@ impl KeyService {
         Ok(raw.into())
     }
 
+    /// sign a message, return base64 encoded string
     pub fn sign(&self, msg: &[u8]) -> Result<String, Error> {
         let mut engine = sha256::Hash::engine();
         engine.input(msg);
