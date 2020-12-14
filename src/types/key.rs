@@ -6,12 +6,15 @@ use secp256k1::{Error as SecpError, PublicKey as InnerPublicKey, SecretKey};
 use serde::Serialize;
 use std::string::ToString;
 
+/// Private key
 #[derive(Debug, Clone)]
 pub struct PrivateKey(SecretKey);
 
+/// public key
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PublicKey(InnerPublicKey);
 
+/// public key format used in transfer transaction
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct PublicKeyWrap {
     #[serde(rename = "type")]
