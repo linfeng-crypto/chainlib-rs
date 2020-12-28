@@ -14,4 +14,7 @@ pub enum Error {
 
     #[error("serialize error: {0}")]
     SerializeError(String),
+
+    #[error("ledger error: {0}")]
+    LedgerError(String),
 }
