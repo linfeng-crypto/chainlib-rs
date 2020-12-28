@@ -7,7 +7,7 @@ Before test, we need to send some coin amount to the hd-wallet which associated 
 ```
 let words = "dune car envelope chuckle elbow slight proud fury remove candy uphold puzzle call select sibling sport gadget please want vault glance verb damage gown";
 let mnemonic = Mnemonic::from_str(words, password)?;
-let key_service = KeyService::new_from_mnemonic(mnemonic)?;
+let key_service = PrivateKeyService::new_from_mnemonic(mnemonic)?;
 let address = key_service.address()?;
 let address_str = address.to_bech32("cro");
 println!("{}", address_str);
