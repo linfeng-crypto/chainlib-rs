@@ -2,19 +2,20 @@ use crate::error::Error;
 use crate::hd_wallet::mnemonic::Mnemonic;
 use crate::types::key::{PrivateKey, PublicKey};
 
+use crate::key_service::KeyService;
+use async_trait::async_trait;
 use bitcoin_hashes::{ripemd160, sha256};
 use bitcoin_hashes::{Hash, HashEngine};
 use secp256k1::Message;
 use stdtx::address::{Address, ADDRESS_SIZE};
 
-
 /// stores private key
 #[derive(Clone)]
-pub struct KeyService {
+pub struct PrivateKeyService {
     pub private_key: PrivateKey,
 }
 
-impl KeyService {
+impl PrivateKeyService {
     /// create a new KeyService from Mnemonic
     pub fn new_from_mnemonic(mnemonic: Mnemonic) -> Result<Self, Error> {
         let private_key = mnemonic.private_key()?;
@@ -25,15 +26,16 @@ impl KeyService {
     pub fn new(private_key: PrivateKey) -> Self {
         Self { private_key }
     }
+}
 
-    /// return the public key
-    #[inline]
-    pub fn public_key(&self) -> PublicKey {
-        PublicKey::from(&self.private_key)
+#[async_trait]
+impl KeyService for PrivateKeyService {
+    fn public_key(&self) -> Result<PublicKey, Error> {
+        Ok(PublicKey::from(&self.private_key))
     }
 
     /// Address returns a Bitcoin style account addresses: RIPEMD160(SHA256(pubkey))
-    pub fn address(&self) -> Result<Address, Error> {
+    fn address(&self) -> Result<Address, Error> {
         let pubkey = PublicKey::from(&self.private_key);
         let pubkey_bytes = pubkey.as_ref().serialize();
         let mut engine = sha256::Hash::engine();
@@ -53,8 +55,7 @@ impl KeyService {
         Ok(raw.into())
     }
 
-    /// sign a message, return base64 encoded string
-    pub fn sign(&self, msg: &[u8]) -> Result<String, Error> {
+    async fn sign(&self, msg: &[u8]) -> Result<String, Error> {
         let mut engine = sha256::Hash::engine();
         engine.input(msg);
         let hash = sha256::Hash::from_engine(engine);
@@ -72,14 +73,14 @@ mod test {
     use super::*;
     use crate::constant::ACCOUNT_ADDRESS_PREFIX;
 
-    #[test]
-    fn test_hd_key() {
+    #[tokio::test]
+    async fn test_hd_key() {
         let words = "dune car envelope chuckle elbow slight proud fury remove candy uphold puzzle call select sibling sport gadget please want vault glance verb damage gown";
         let mnemonic = Mnemonic::from_str(words, None).unwrap();
-        let key_service = KeyService::new_from_mnemonic(mnemonic).unwrap();
+        let private_key_service = PrivateKeyService::new_from_mnemonic(mnemonic).unwrap();
 
         // test address
-        let address = key_service.address().unwrap();
+        let address = private_key_service.address().unwrap();
         assert_eq!(
             address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
             "cro1u9q8mfpzhyv2s43js7l5qseapx5kt3g2rf7ppf"
@@ -88,12 +89,12 @@ mod test {
         // test private key
         let private_raw = base64::decode("1Jp5fbY7YcFI0XZ+YW/xXD3ZyDtjy6YcIY6hcvI4Yio=").unwrap();
         assert_eq!(
-            key_service.private_key.as_ref(),
+            private_key_service.private_key.as_ref(),
             PrivateKey::from_slice(&private_raw).unwrap().as_ref()
         );
 
         // test public key
-        let public_key = PublicKey::from(&key_service.private_key);
+        let public_key = PublicKey::from(&private_key_service.private_key);
         let pubkey_str = public_key.to_string();
         assert_eq!(pubkey_str, "AntL+UxMyJ9NZ9DGLp2v7a3dlSxiNXMaItyOXSRw8iYi");
 
@@ -119,7 +120,7 @@ mod test {
             100, 120, 48, 48, 48, 57, 117, 108, 106, 34, 125, 125, 93, 44, 34, 115, 101, 113, 117,
             101, 110, 99, 101, 34, 58, 34, 48, 34, 125,
         ];
-        let s = key_service.sign(&sign_msg).unwrap();
+        let s = private_key_service.sign(&sign_msg).await.unwrap();
         let s_expect = "bpPVZg1frGFAKM54i5Wr9PRcg31wk4vBNruYUuN9O9QvIJs+rFshRqZlhd++qBQYUvMdhHO4g/0UuB7JRaESvA==";
         println!("{}", s);
         assert_eq!(s, s_expect);

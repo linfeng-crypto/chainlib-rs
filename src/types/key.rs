@@ -85,3 +85,9 @@ impl AsRef<InnerPublicKey> for PublicKey {
         &self.0
     }
 }
+
+impl From<InnerPublicKey> for PublicKey {
+    fn from(inner_pubkey: InnerPublicKey) -> Self {
+        Self(inner_pubkey)
+    }
+}

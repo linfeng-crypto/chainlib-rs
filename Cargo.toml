@@ -12,19 +12,34 @@ sorted-json = "0.1"
 serde_json = "1.0"
 secp256k1 = { version = "0.17", default-features = false, features = ["rand"] }
 tiny-bip39 = "0.8"
-anyhow = {version = "1.0", features = ["std"]}
+anyhow = { version = "1.0", features = ["std"] }
 hdwallet = "0.2"
 bitcoin_hashes = "0.9"
 rand = "0.7"
 base64 = "0.13"
-stdtx = {version = "0.4.0-pre", features = ["amino"] }
+stdtx = { version = "0.4.0-pre", features = ["amino"] }
 thiserror = "1.0"
+tokio = { version = "0.2", features = ["full"] }
+ledger-crypto = { git = "https://github.com/crypto-com/ledger-crypto-rs", branch = "master" }
+ledger-transport = { git = "https://github.com/Zondax/ledger-rs.git", branch = "master" }
+zx-bip44 = { git = "https://github.com/Zondax/blockchain-tools-rs" }
+async-trait = "0.1"
+log = "0.4"
+
+[dependencies.ledger]
+package = "ledger-transport-hid"
+git = "https://github.com/Zondax/ledger-rs.git"
+branch = "master"
 
 [[example]]
-name = "example"
-path = "example/example.rs"
+name = "mnemonic"
+path = "example/example_mnemonic.rs"
+
+[[example]]
+name = "ledger"
+path = "example/example_ledger.rs"
 
 
 [dev-dependencies]
-reqwest = {version  = "0.10.9", features = ["json"] }
-tokio = { verison = "0.2", features = ["full"] }
+reqwest = { version  = "0.10.9", features = ["json"] }
+env_logger = "0.8.2"

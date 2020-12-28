@@ -8,11 +8,11 @@ use crate::utils::codec::serde_to_str;
 use serde::Serialize;
 use stdtx::Address;
 
-pub struct TransferBuilder {
+pub struct TransferBuilder<T> {
     pub fee: Amount,
     pub gas: Option<u64>,
     pub memo: String,
-    pub key_service: KeyService,
+    pub key_service: T,
     pub chain_id: String,
     pub signatures: Vec<Signature>,
     pub transfers: Vec<Transfer>,
@@ -30,12 +30,15 @@ struct SignMsg {
     pub msgs: Vec<Transfer>,
 }
 
-impl TransferBuilder {
+impl<T> TransferBuilder<T>
+where
+    T: KeyService,
+{
     pub fn new(
         fee: Amount,
         gas: Option<u64>,
         memo: Option<String>,
-        key_service: KeyService,
+        key_service: T,
         chain_id: String,
     ) -> Self {
         let memo = memo.unwrap_or_default();
@@ -50,7 +53,7 @@ impl TransferBuilder {
         }
     }
 
-    pub fn add_transfer(
+    pub async fn add_transfer(
         &mut self,
         amount: u64,
         denom: Denom,
@@ -70,7 +73,7 @@ impl TransferBuilder {
         }
     }
 
-    fn sign(&mut self, account_number: u64, sequence: u64) -> Result<(), Error> {
+    async fn sign(&mut self, account_number: u64, sequence: u64) -> Result<(), Error> {
         let fee = self.get_fee();
         let sign_msg = SignMsg {
             account_number,
@@ -85,11 +88,13 @@ impl TransferBuilder {
         let sign_str = sorted_json::to_json(&value)
             .replace("\n", "")
             .replace(" ", "");
-        let signature = self.key_service.sign(sign_str.as_bytes())?;
+        let signature = self.key_service.sign(sign_str.as_bytes()).await?;
+        tokio::time::delay_for(std::time::Duration::from_secs(2)).await;
+        let public_key = self.key_service.public_key()?;
 
         let signature = Signature {
             signature,
-            pub_key: self.key_service.public_key().into(),
+            pub_key: public_key.into(),
             account_number,
             sequence,
         };
@@ -97,13 +102,13 @@ impl TransferBuilder {
         Ok(())
     }
 
-    pub fn build(
+    pub async fn build(
         &mut self,
         account_number: u64,
         sequence: u64,
         sync_mode: SyncMode,
     ) -> Result<Transaction, Error> {
-        self.sign(account_number, sequence)?;
+        self.sign(account_number, sequence).await?;
         let fee = self.get_fee();
         let tx = Tx {
             messages: self.transfers.clone(),
@@ -122,31 +127,34 @@ impl TransferBuilder {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::constant::ACCOUNT_ADDRESS_PREFIX;
     use crate::hd_wallet::mnemonic::Mnemonic;
     use crate::types::basic::Amount;
     use crate::types::key::PublicKey;
     use crate::types::transaction::TransferValue;
+    use crate::constant::ACCOUNT_ADDRESS_PREFIX;
+    use crate::key_service::private_key_service::PrivateKeyService;
 
-    #[test]
-    fn test_tx_builder() {
+    #[tokio::test]
+    async fn test_tx_builder() {
         let fee = Amount::new(100000, Denom::Basecro);
         let gas = Some(300000);
         let memo = None;
         let words = "dune car envelope chuckle elbow slight proud fury remove candy uphold puzzle call select sibling sport gadget please want vault glance verb damage gown";
         let mnemonic = Mnemonic::from_str(words, None).unwrap();
-        let key_service = KeyService::new_from_mnemonic(mnemonic).unwrap();
+        let key_service = PrivateKeyService::new_from_mnemonic(mnemonic).unwrap();
         let chain_id = "test".to_string();
         let mut builder = TransferBuilder::new(fee.clone(), gas, memo, key_service, chain_id);
         let (_, to_address) =
             Address::from_bech32("cro1s2gsnugjhpzac8m7necv3527jp28z9w002najd").unwrap();
         builder
             .add_transfer(100000000, Denom::Basecro, to_address.clone())
+            .await
             .unwrap();
         let account_number = 0;
         let sequence = 0;
         let transfer = builder
             .build(account_number, sequence, SyncMode::Sync)
+            .await
             .unwrap();
         let transfer_expected = Transaction {
             tx: Tx {
