@@ -26,6 +26,19 @@ impl PrivateKeyService {
     pub fn new(private_key: PrivateKey) -> Self {
         Self { private_key }
     }
+
+    /// sig msg
+    fn sign(&self, msg: &[u8]) -> Result<String, Error> {
+        let mut engine = sha256::Hash::engine();
+        engine.input(msg);
+        let hash = sha256::Hash::from_engine(engine);
+        let message = Message::from_slice(hash.as_inner())?;
+        let signer = secp256k1::Secp256k1::signing_only();
+        let signature = signer.sign(&message, self.private_key.as_ref());
+        let raw = signature.serialize_compact();
+        let signature_str = base64::encode(&raw);
+        Ok(signature_str)
+    }
 }
 
 #[async_trait]
@@ -55,16 +68,10 @@ impl KeyService for PrivateKeyService {
         Ok(raw.into())
     }
 
+    /// sig msg
     async fn sign(&self, msg: &[u8]) -> Result<String, Error> {
-        let mut engine = sha256::Hash::engine();
-        engine.input(msg);
-        let hash = sha256::Hash::from_engine(engine);
-        let message = Message::from_slice(hash.as_inner())?;
-        let signer = secp256k1::Secp256k1::signing_only();
-        let signature = signer.sign(&message, self.private_key.as_ref());
-        let raw = signature.serialize_compact();
-        let signature_str = base64::encode(&raw);
-        Ok(signature_str)
+        let result = self.sign(msg)?;
+        Ok(result)
     }
 }
 
@@ -120,7 +127,7 @@ mod test {
             100, 120, 48, 48, 48, 57, 117, 108, 106, 34, 125, 125, 93, 44, 34, 115, 101, 113, 117,
             101, 110, 99, 101, 34, 58, 34, 48, 34, 125,
         ];
-        let s = private_key_service.sign(&sign_msg).await.unwrap();
+        let s = private_key_service.sign(&sign_msg).unwrap();
         let s_expect = "bpPVZg1frGFAKM54i5Wr9PRcg31wk4vBNruYUuN9O9QvIJs+rFshRqZlhd++qBQYUvMdhHO4g/0UuB7JRaESvA==";
         println!("{}", s);
         assert_eq!(s, s_expect);

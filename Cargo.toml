@@ -17,7 +17,7 @@ hdwallet = "0.2"
 bitcoin_hashes = "0.9"
 rand = "0.7"
 base64 = "0.13"
-stdtx = { version = "0.4.0-pre", features = ["amino"] }
+stdtx = "0.4.0"
 thiserror = "1.0"
 tokio = { version = "0.2", features = ["full"] }
 ledger-crypto = { git = "https://github.com/crypto-com/ledger-crypto-rs", branch = "master" }
@@ -25,11 +25,26 @@ ledger-transport = { git = "https://github.com/Zondax/ledger-rs.git", branch = "
 zx-bip44 = { git = "https://github.com/Zondax/blockchain-tools-rs" }
 async-trait = "0.1"
 log = "0.4"
+tonic = "0.3.1"
+eyre = "0.6.4"
+signature = "1.2.2"
+prost = "0.6"
+prost-types = "0.6"
 
 [dependencies.ledger]
 package = "ledger-transport-hid"
 git = "https://github.com/Zondax/ledger-rs.git"
 branch = "master"
+
+[build-dependencies]
+prost = "0.6"
+prost-build = "0.6"
+tonic = "0.3.1"
+tonic-build = "0.3.1"
+regex = "1"
+tempdir = "0.3"
+walkdir = "2"
+
 
 [[example]]
 name = "mnemonic"
@@ -39,7 +54,16 @@ path = "example/example_mnemonic.rs"
 name = "ledger"
 path = "example/example_ledger.rs"
 
+[[example]]
+name = "protobuf"
+path = "example/example_protobuf.rs"
 
 [dev-dependencies]
 reqwest = { version  = "0.10.9", features = ["json"] }
 env_logger = "0.8.2"
+tonic = "0.3.1"
+
+[features]
+default = ["amino"]
+amino = []
+grpc = []

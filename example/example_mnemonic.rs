@@ -3,7 +3,7 @@ use cro_sign_tool::constant::ACCOUNT_ADDRESS_PREFIX;
 use cro_sign_tool::hd_wallet::mnemonic::Mnemonic;
 use cro_sign_tool::key_service::private_key_service::PrivateKeyService;
 use cro_sign_tool::key_service::KeyService;
-use cro_sign_tool::tx_builder::TransferBuilder;
+use cro_sign_tool::tx_builder::amino::TransferBuilder;
 use cro_sign_tool::types::basic::Amount;
 use cro_sign_tool::types::basic::{Denom, SyncMode};
 use cro_sign_tool::types::transaction::Transaction;

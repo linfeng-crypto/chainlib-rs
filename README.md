@@ -3,7 +3,7 @@ cro-sign-tool is a lib to create hd wallet and sign [CRO](https://github.com/cry
 # prepare
 Before test, we need to send some coin amount to the hd-wallet which associated with the mnemonic words.
 
-1.transfer some coin to mnemonic words account, to get the address, you can use the following code
+1.transfer some coin to mnemonic words account, to get the hd address, you can use the following code
 ```
 let words = "dune car envelope chuckle elbow slight proud fury remove candy uphold puzzle call select sibling sport gadget please want vault glance verb damage gown";
 let mnemonic = Mnemonic::from_str(words, password)?;
@@ -16,7 +16,7 @@ or you can recover mnemonic to local storage:
 `chain-maind keys add hd-wallet --keyring-backend test --recover`
 and use `chain-maind keys list --keyring-backend test` to see the address
 
-2.Transfer some coin amount to the hd_address using `chain-maind`:
+2.Transfer some coin amount to the hd address using `chain-maind`:
 ```
 chain-maind tx bank send \
     ${from_address} \
@@ -30,4 +30,6 @@ chain-maind tx bank send \
 3.There are some coin in the hd-wallet now, you can test to sign offline and send the signed transaction to chain api url, to see the detail, go to example.
 
 # build
-`cargo build --example example`
+`cargo build --example ledger`
+`cargo build --example mnemonic`
+`cargo build --example protobuf --features=grpc`

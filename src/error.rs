@@ -17,4 +17,7 @@ pub enum Error {
 
     #[error("ledger error: {0}")]
     LedgerError(String),
+
+    #[error("prost encode error")]
+    ProstEncodeError(#[from] prost::EncodeError),
 }
