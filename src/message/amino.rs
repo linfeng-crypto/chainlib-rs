@@ -1,0 +1,45 @@
+use crate::constant::ACCOUNT_ADDRESS_PREFIX;
+use crate::types::basic::Amount;
+use serde::Serialize;
+use stdtx::Address;
+
+/// the message in Tx
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct Message<V: Serialize> {
+    #[serde(rename = "type")]
+    pub transfer_type: String,
+    pub value: V,
+}
+
+/// the value in Transfer
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct TransferValue {
+    pub from_address: String,
+    pub to_address: String,
+    pub amount: Vec<Amount>,
+}
+
+impl TransferValue {
+    /// create a new TransferValue
+    pub fn new(from_address: Address, to_address: Address, amount: Amount) -> Self {
+        Self {
+            from_address: from_address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
+            to_address: to_address.to_bech32(ACCOUNT_ADDRESS_PREFIX),
+            amount: vec![amount],
+        }
+    }
+}
+
+/// the message in transfer tx
+pub type Transfer = Message<TransferValue>;
+
+impl Transfer {
+    /// create a new transfer message
+    pub fn new(from_address: Address, to_address: Address, amount: Amount) -> Self {
+        let transfer_value = TransferValue::new(from_address.into(), to_address.into(), amount);
+        Self {
+            transfer_type: "cosmos-sdk/MsgSend".into(),
+            value: transfer_value,
+        }
+    }
+}

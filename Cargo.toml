@@ -3,6 +3,7 @@ name = "cro-sign-tool"
 version = "0.1.0"
 authors = ["linfeng <linfeng@crypto.com>"]
 edition = "2018"
+autoexamples = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -23,6 +24,7 @@ tokio = { version = "0.2", features = ["full"] }
 ledger-crypto = { git = "https://github.com/crypto-com/ledger-crypto-rs", branch = "master" }
 ledger-transport = { git = "https://github.com/Zondax/ledger-rs.git", branch = "master" }
 zx-bip44 = { git = "https://github.com/Zondax/blockchain-tools-rs" }
+reqwest = { version = "0.10.9", features = ["json"] }
 async-trait = "0.1"
 log = "0.4"
 tonic = "0.3.1"
@@ -45,23 +47,18 @@ regex = "1"
 tempdir = "0.3"
 walkdir = "2"
 
-
 [[example]]
-name = "mnemonic"
-path = "example/example_mnemonic.rs"
-
-[[example]]
-name = "ledger"
-path = "example/example_ledger.rs"
+name = "amino"
+path = "examples/example_amino.rs"
+required-features = ["amino"]
 
 [[example]]
 name = "protobuf"
-path = "example/example_protobuf.rs"
+path = "examples/example_protobuf.rs"
+required-features = ["grpc"]
 
 [dev-dependencies]
-reqwest = { version  = "0.10.9", features = ["json"] }
 env_logger = "0.8.2"
-tonic = "0.3.1"
 
 [features]
 default = ["amino"]

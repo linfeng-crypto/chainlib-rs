@@ -1,71 +1,17 @@
 use anyhow::Error;
 
+use cro_sign_tool::client::Client;
 use cro_sign_tool::constant::ACCOUNT_ADDRESS_PREFIX;
 use cro_sign_tool::hd_wallet::mnemonic::Mnemonic;
 use cro_sign_tool::key_service::private_key_service::PrivateKeyService;
 use cro_sign_tool::key_service::KeyService;
 use cro_sign_tool::proto::cosmos::base::v1beta1::Coin;
 use cro_sign_tool::proto::cosmos::tx::v1beta1::Fee;
-use cro_sign_tool::proto::tendermint::rpc::grpc::{
-    broadcast_api_client::BroadcastApiClient, RequestBroadcastTx, ResponseBroadcastTx,
-};
-use cro_sign_tool::tx_builder::grpc::TxBuilder;
-
-struct Client {
-    base_api_url: String,
-    grpc_url: String,
-}
-
-impl Client {
-    fn new(base_api_url: String, grpc_url: String) -> Self {
-        Self {
-            base_api_url,
-            grpc_url,
-        }
-    }
-
-    pub async fn get_account_info(&self, address: String) -> Result<(u64, u64), Error> {
-        let url = format!(
-            "{}/cosmos/auth/v1beta1/accounts/{}",
-            self.base_api_url, address
-        );
-        let response = reqwest::get(&url)
-            .await
-            .unwrap()
-            .json::<serde_json::Value>()
-            .await
-            .expect("get account info response error");
-        // {'account': {'@type': '/cosmos.auth.v1beta1.BaseAccount', 'address': 'cro1u9q8mfpzhyv2s43js7l5qseapx5kt3g2rf7ppf', 'pub_key': {'@type': '/cosmos.crypto.secp256k1.PubKey', 'key': 'AntL+UxMyJ9NZ9DGLp2v7a3dlSxiNXMaItyOXSRw8iYi'}, 'account_number': '9', 'sequence': '25'}}
-        let account_number = response["account"]["account_number"]
-            .as_str()
-            .unwrap()
-            .parse()
-            .unwrap();
-        let sequence = response["account"]["sequence"]
-            .as_str()
-            .unwrap()
-            .parse()
-            .unwrap();
-        Ok((account_number, sequence))
-    }
-
-    pub async fn broadcast_tx(self, tx: Vec<u8>) -> ResponseBroadcastTx {
-        let request = RequestBroadcastTx { tx };
-        let mut client = BroadcastApiClient::connect(self.grpc_url)
-            .await
-            .expect("connect to grpc server failed");
-
-        let request = tonic::Request::new(request.clone());
-        let response = client.broadcast_tx(request).await.unwrap();
-        let tx_response = response.into_inner();
-        tx_response
-    }
-}
+use cro_sign_tool::tx_builder::TxBuilder;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     env_logger::init();
-
     // base api url is set as `address = "tcp://0.0.0.0:1317"` in $CHAIN_MAIND_HOME/config/app.toml
     let base_api_url = "http://127.0.0.1:1317".to_string();
     // grpc url is set in `grpc_laddr` in $CHAIN_MAIND_HOME/config/config.toml
@@ -93,7 +39,7 @@ async fn main() -> Result<(), Error> {
     let address_str = self_address.to_bech32(ACCOUNT_ADDRESS_PREFIX);
 
     // update account info
-    let (account_number, sequence) = client.get_account_info(address_str).await.unwrap();
+    let (account_number, sequence) = client.get_account_info(&address_str).await.unwrap();
 
     // add msg
     let to_address = "cro1fj6jpmuykvra4kxrw0cp20e4vx4r8eda8q3yn9".into();

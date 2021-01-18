@@ -1,25 +1,25 @@
 use crate::error::Error;
 use crate::key_service::KeyService;
-use crate::types::basic::{Amount, Denom, Fee, SyncMode};
+use crate::types::basic::{Amount, Fee, SyncMode};
 use crate::types::signature::Signature;
-use crate::types::transaction::{Transaction, Transfer, Tx};
+use crate::types::transaction::{Transaction, Tx};
 use crate::utils::codec::serde_to_str;
-
 use serde::Serialize;
-use stdtx::Address;
 
-pub struct TransferBuilder<T> {
-    pub fee: Amount,
-    pub gas: Option<u64>,
-    pub memo: String,
+#[derive(Clone)]
+pub struct TxBuilder<T: KeyService + Clone, M: Serialize + Clone> {
     pub key_service: T,
     pub chain_id: String,
-    pub signatures: Vec<Signature>,
-    pub transfers: Vec<Transfer>,
+    pub messages: Vec<M>,
+    pub memo: String,
+    pub account_number: u64,
+    pub sequence: u64,
+    pub fee: Option<Amount>,
+    pub gas: Option<u64>,
 }
 
 #[derive(Serialize, Debug, Clone)]
-struct SignMsg {
+struct SignMsg<M: Serialize> {
     #[serde(serialize_with = "serde_to_str")]
     pub account_number: u64,
     #[serde(serialize_with = "serde_to_str")]
@@ -27,19 +27,20 @@ struct SignMsg {
     pub chain_id: String,
     pub memo: String,
     pub fee: Fee,
-    pub msgs: Vec<Transfer>,
+    pub msgs: Vec<M>,
 }
 
-impl<T> TransferBuilder<T>
+impl<T, M> TxBuilder<T, M>
 where
-    T: KeyService,
+    T: KeyService + Clone,
+    M: Serialize + Clone,
 {
     pub fn new(
-        fee: Amount,
-        gas: Option<u64>,
-        memo: Option<String>,
         key_service: T,
         chain_id: String,
+        memo: Option<String>,
+        fee: Option<Amount>,
+        gas: Option<u64>,
     ) -> Self {
         let memo = memo.unwrap_or_default();
         Self {
@@ -48,40 +49,49 @@ where
             memo,
             key_service,
             chain_id,
-            signatures: vec![],
-            transfers: vec![],
+            sequence: 0,
+            account_number: 0,
+            messages: vec![],
         }
     }
 
-    pub async fn add_transfer(
-        &mut self,
-        amount: u64,
-        denom: Denom,
-        to_address: Address,
-    ) -> Result<(), Error> {
-        let from_address = self.key_service.address()?;
-        let transfer = Transfer::new(from_address, to_address, amount, denom)?;
-        self.transfers.push(transfer);
-        Ok(())
+    pub fn set_account_number(&mut self, account_number: u64) -> &mut Self {
+        self.account_number = account_number;
+        self
+    }
+
+    pub fn set_sequence(&mut self, sequence: u64) -> &mut Self {
+        self.sequence = sequence;
+        self
+    }
+
+    pub fn add_message(&mut self, msg: M) -> &mut Self {
+        self.messages.push(msg);
+        self
     }
 
     #[inline]
     fn get_fee(&self) -> Fee {
+        let amount = if self.fee.is_some() {
+            vec![self.fee.clone().unwrap()]
+        } else {
+            vec![]
+        };
         Fee {
             gas: self.gas.unwrap_or(20000),
-            amount: vec![self.fee.clone()],
+            amount,
         }
     }
 
-    async fn sign(&mut self, account_number: u64, sequence: u64) -> Result<(), Error> {
+    async fn sign(&mut self) -> Result<Signature, Error> {
         let fee = self.get_fee();
         let sign_msg = SignMsg {
-            account_number,
-            sequence,
+            account_number: self.account_number,
+            sequence: self.sequence,
             chain_id: self.chain_id.clone(),
             memo: self.memo.clone(),
             fee,
-            msgs: self.transfers.clone(),
+            msgs: self.messages.clone(),
         };
         let value =
             serde_json::to_value(&sign_msg).map_err(|e| Error::SerializeError(e.to_string()))?;
@@ -94,26 +104,20 @@ where
         let signature = Signature {
             signature,
             pub_key: public_key.into(),
-            account_number,
-            sequence,
+            account_number: self.account_number,
+            sequence: self.sequence,
         };
-        self.signatures.push(signature);
-        Ok(())
+        Ok(signature)
     }
 
-    pub async fn build(
-        &mut self,
-        account_number: u64,
-        sequence: u64,
-        sync_mode: SyncMode,
-    ) -> Result<Transaction, Error> {
-        self.sign(account_number, sequence).await?;
+    pub async fn build(&mut self, sync_mode: SyncMode) -> Result<Transaction<M>, Error> {
+        let signature = self.sign().await?;
         let fee = self.get_fee();
         let tx = Tx {
-            messages: self.transfers.clone(),
+            messages: self.messages.clone(),
             fee,
             memo: self.memo.clone(),
-            signatures: self.signatures.clone(),
+            signatures: vec![signature],
         };
         let transaction = Transaction {
             tx,
@@ -129,9 +133,10 @@ mod test {
     use crate::constant::ACCOUNT_ADDRESS_PREFIX;
     use crate::hd_wallet::mnemonic::Mnemonic;
     use crate::key_service::private_key_service::PrivateKeyService;
-    use crate::types::basic::Amount;
+    use crate::message::{Transfer, TransferValue};
+    use crate::types::basic::{Amount, Denom};
     use crate::types::key::PublicKey;
-    use crate::types::transaction::TransferValue;
+    use stdtx::Address;
 
     #[tokio::test]
     async fn test_tx_builder() {
@@ -142,19 +147,16 @@ mod test {
         let mnemonic = Mnemonic::from_str(words, None).unwrap();
         let key_service = PrivateKeyService::new_from_mnemonic(mnemonic).unwrap();
         let chain_id = "test".to_string();
-        let mut builder = TransferBuilder::new(fee.clone(), gas, memo, key_service, chain_id);
+        let mut builder = TxBuilder::new(key_service, chain_id, memo, Some(fee.clone()), gas);
         let (_, to_address) =
             Address::from_bech32("cro1s2gsnugjhpzac8m7necv3527jp28z9w002najd").unwrap();
-        builder
-            .add_transfer(100000000, Denom::Basecro, to_address.clone())
-            .await
-            .unwrap();
+        let from_address = builder.key_service.address().unwrap();
+        let amount = Amount::new(100000000, Denom::Basecro);
+        let msg = Transfer::new(from_address, to_address, amount);
+        builder.add_message(msg);
         let account_number = 0;
         let sequence = 0;
-        let transfer = builder
-            .build(account_number, sequence, SyncMode::Sync)
-            .await
-            .unwrap();
+        let transfer = builder.build(SyncMode::Sync).await.unwrap();
         let transfer_expected = Transaction {
             tx: Tx {
                 fee: Fee {
