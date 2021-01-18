@@ -2,7 +2,7 @@ use anyhow::Error;
 use cro_sign_tool::constant::{ACCOUNT_ADDRESS_PREFIX, FUNDRAISER_PATH};
 use cro_sign_tool::key_service::ledger_service::LedgerServiceHID;
 use cro_sign_tool::key_service::KeyService;
-use cro_sign_tool::tx_builder::TransferBuilder;
+use cro_sign_tool::tx_builder::amino::TransferBuilder;
 use cro_sign_tool::types::basic::Amount;
 use cro_sign_tool::types::basic::{Denom, SyncMode};
 use cro_sign_tool::types::transaction::Transaction;

@@ -89,7 +89,6 @@ where
             .replace("\n", "")
             .replace(" ", "");
         let signature = self.key_service.sign(sign_str.as_bytes()).await?;
-        tokio::time::delay_for(std::time::Duration::from_secs(2)).await;
         let public_key = self.key_service.public_key()?;
 
         let signature = Signature {
@@ -127,12 +126,12 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::constant::ACCOUNT_ADDRESS_PREFIX;
     use crate::hd_wallet::mnemonic::Mnemonic;
+    use crate::key_service::private_key_service::PrivateKeyService;
     use crate::types::basic::Amount;
     use crate::types::key::PublicKey;
     use crate::types::transaction::TransferValue;
-    use crate::constant::ACCOUNT_ADDRESS_PREFIX;
-    use crate::key_service::private_key_service::PrivateKeyService;
 
     #[tokio::test]
     async fn test_tx_builder() {
