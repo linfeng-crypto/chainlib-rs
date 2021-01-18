@@ -27,9 +27,11 @@ chain-maind tx bank send \
     --sign-mode amino-json
 ```
 
-3.There are some coin in the hd-wallet now, you can test to sign offline and send the signed transaction to chain api url, to see the detail, go to example.
+3.There are some coin in the hd-wallet now, you can test to sign offline and send the signed transaction to chain api url, to see the detail, go to examples.
 
-# build
-`cargo build --example ledger`
-`cargo build --example mnemonic`
+# build examples
+`cargo build --example amino`
+
+or 
+
 `cargo build --example protobuf --features=grpc`
