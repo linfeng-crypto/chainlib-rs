@@ -20,4 +20,10 @@ pub enum Error {
 
     #[error("prost encode error")]
     ProstEncodeError(#[from] prost::EncodeError),
+
+    #[error("client request error")]
+    RequestError(#[from] reqwest::Error),
+
+    #[error("client error: {0}")]
+    ClientError(String),
 }
