@@ -1,5 +1,5 @@
-// Copyright (c) 2020, cosmos (licensed under the Apache License Version 2.0)
-// Modifications Copyright (c) 2020, Foris Limited (licensed under the Apache License, Version 2.0)
+// Copyright (c) 2020-2021, Cosmos Rust authors (licensed under the Apache License Version 2.0)
+// Modifications Copyright (c) 2021, Foris Limited (licensed under the Apache License, Version 2.0)
 
 //! Build CosmosSDK/Tendermint/IBC proto files. This build script clones the CosmosSDK version
 //! specified in the COSMOS_REV constant and then uses that to build the required
@@ -19,7 +19,7 @@ mod grpc {
     use walkdir::WalkDir;
 
     /// The Cosmos commit or tag to be cloned and used to build the proto files
-    const COSMOS_REV: &str = "v0.40.0-rc6";
+    const COSMOS_REV: &str = "v0.40.0";
     // TODO: use version tag
     const TENDERMINT_REV: &str = "v0.34.2";
 
