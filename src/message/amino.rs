@@ -36,7 +36,7 @@ pub type Transfer = Message<TransferValue>;
 impl Transfer {
     /// create a new transfer message
     pub fn new(from_address: Address, to_address: Address, amount: Amount) -> Self {
-        let transfer_value = TransferValue::new(from_address.into(), to_address.into(), amount);
+        let transfer_value = TransferValue::new(from_address, to_address, amount);
         Self {
             transfer_type: "cosmos-sdk/MsgSend".into(),
             value: transfer_value,
