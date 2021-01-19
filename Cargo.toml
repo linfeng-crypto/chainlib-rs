@@ -18,7 +18,7 @@ rand = "0.7"
 base64 = "0.13"
 stdtx = "0.4.0"
 thiserror = "1.0"
-tokio = { version = "0.2", features = ["full"] }
+tokio = { version = "1.0", features = ["full"] }
 ledger-crypto = { git = "https://github.com/crypto-com/ledger-crypto-rs", branch = "master" }
 ledger-transport = { git = "https://github.com/Zondax/ledger-rs.git", branch = "master" }
 zx-bip44 = { git = "https://github.com/Zondax/blockchain-tools-rs" }
