@@ -14,7 +14,7 @@ tiny-bip39 = "0.8"
 anyhow = { version = "1.0", features = ["std"] }
 hdwallet = "0.2"
 bitcoin_hashes = "0.9"
-rand = "0.7"
+rand = "0.8"
 base64 = "0.13"
 stdtx = "0.4.0"
 thiserror = "1.0"
