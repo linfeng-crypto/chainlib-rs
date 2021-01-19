@@ -36,7 +36,7 @@ impl Amount {
         };
         Self {
             denom: Denom::Basecro,
-            amount: amount,
+            amount,
         }
     }
 }

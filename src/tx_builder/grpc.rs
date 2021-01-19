@@ -126,8 +126,8 @@ impl<T: KeyService + Clone> TxBuilder<T> {
         let body_bytes = self.raw_tx_body()?;
         let auth_info_bytes = encode(&self.auth_info()?)?;
         let sign_doc = SignDoc {
-            body_bytes: body_bytes.clone(),
-            auth_info_bytes: auth_info_bytes.clone(),
+            body_bytes,
+            auth_info_bytes,
             chain_id: self.chain_id.clone(),
             account_number: self.account_number,
         };

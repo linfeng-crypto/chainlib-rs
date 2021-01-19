@@ -62,8 +62,7 @@ impl Client {
 
         let request = tonic::Request::new(request.clone());
         let response = client.broadcast_tx(request).await.unwrap();
-        let tx_response = response.into_inner();
-        tx_response
+        response.into_inner()
     }
     #[cfg(not(feature = "grpc"))]
     pub async fn broadcast_tx<M: Serialize>(&self, tx: Transaction<M>) -> Result<String, Error> {
