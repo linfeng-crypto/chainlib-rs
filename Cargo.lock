@@ -190,6 +190,43 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "chainlib"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64 0.13.0",
+ "bitcoin_hashes",
+ "env_logger",
+ "eyre",
+ "hdwallet",
+ "ledger-crypto",
+ "ledger-transport",
+ "ledger-transport-hid",
+ "log",
+ "prost",
+ "prost-build",
+ "prost-types",
+ "rand 0.7.3",
+ "regex",
+ "reqwest",
+ "secp256k1",
+ "serde",
+ "serde_json",
+ "signature",
+ "sorted-json",
+ "stdtx",
+ "tempdir",
+ "thiserror",
+ "tiny-bip39",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "walkdir",
+ "zx-bip44",
+]
+
+[[package]]
 name = "cloudabi"
 version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -244,43 +281,6 @@ name = "cpuid-bool"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8aebca1129a03dc6dc2b127edd729435bbc4a37e1d5f4d7513165089ceb02634"
-
-[[package]]
-name = "cro-sign-tool"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "base64 0.13.0",
- "bitcoin_hashes",
- "env_logger",
- "eyre",
- "hdwallet",
- "ledger-crypto",
- "ledger-transport",
- "ledger-transport-hid",
- "log",
- "prost",
- "prost-build",
- "prost-types",
- "rand 0.7.3",
- "regex",
- "reqwest",
- "secp256k1",
- "serde",
- "serde_json",
- "signature",
- "sorted-json",
- "stdtx",
- "tempdir",
- "thiserror",
- "tiny-bip39",
- "tokio",
- "tonic",
- "tonic-build",
- "walkdir",
- "zx-bip44",
-]
 
 [[package]]
 name = "crypto-mac"

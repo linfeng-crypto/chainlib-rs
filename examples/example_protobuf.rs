@@ -1,13 +1,13 @@
 use anyhow::Error;
 
-use cro_sign_tool::client::Client;
-use cro_sign_tool::constant::ACCOUNT_ADDRESS_PREFIX;
-use cro_sign_tool::hd_wallet::mnemonic::Mnemonic;
-use cro_sign_tool::key_service::private_key_service::PrivateKeyService;
-use cro_sign_tool::key_service::KeyService;
-use cro_sign_tool::proto::cosmos::base::v1beta1::Coin;
-use cro_sign_tool::proto::cosmos::tx::v1beta1::Fee;
-use cro_sign_tool::tx_builder::TxBuilder;
+use chainlib::client::Client;
+use chainlib::constant::ACCOUNT_ADDRESS_PREFIX;
+use chainlib::hd_wallet::mnemonic::Mnemonic;
+use chainlib::key_service::private_key_service::PrivateKeyService;
+use chainlib::key_service::KeyService;
+use chainlib::proto::cosmos::base::v1beta1::Coin;
+use chainlib::proto::cosmos::tx::v1beta1::Fee;
+use chainlib::tx_builder::TxBuilder;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
