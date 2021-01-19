@@ -29,7 +29,7 @@ tonic = "0.3.1"
 eyre = "0.6.4"
 signature = "1.2.2"
 prost = "0.7"
-prost-types = "0.6"
+prost-types = "0.7"
 
 [dependencies.ledger]
 package = "ledger-transport-hid"
