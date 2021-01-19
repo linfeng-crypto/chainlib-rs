@@ -1,3 +1,6 @@
+// Copyright (c) 2020, cosmos (licensed under the Apache License Version 2.0)
+// Modifications Copyright (c) 2020, Foris Limited (licensed under the Apache License, Version 2.0)
+
 //! Build CosmosSDK/Tendermint/IBC proto files. This build script clones the CosmosSDK version
 //! specified in the COSMOS_REV constant and then uses that to build the required
 //! proto files for further compilation. This is based on the proto-compiler code
