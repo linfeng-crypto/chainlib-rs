@@ -25,7 +25,7 @@ zx-bip44 = { git = "https://github.com/Zondax/blockchain-tools-rs" }
 reqwest = { version = "0.11.0", features = ["json"] }
 async-trait = "0.1"
 log = "0.4"
-tonic = "0.3.1"
+tonic = "0.4.0"
 eyre = "0.6.4"
 signature = "1.2.2"
 prost = "0.7"
@@ -39,7 +39,7 @@ branch = "master"
 [build-dependencies]
 prost = "0.7"
 prost-build = "0.7"
-tonic = "0.3.1"
+tonic = "0.4.0"
 tonic-build = "0.4.0"
 regex = "1"
 tempdir = "0.3"
