@@ -210,7 +210,7 @@ dependencies = [
  "ledger-transport",
  "ledger-transport-hid",
  "log",
- "prost 0.6.1",
+ "prost 0.7.0",
  "prost-build",
  "prost-types 0.6.1",
  "rand 0.7.3",
