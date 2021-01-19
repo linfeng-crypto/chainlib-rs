@@ -951,7 +951,7 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 [[package]]
 name = "ledger-apdu"
 version = "0.7.0"
-source = "git+https://github.com/Zondax/ledger-rs?branch=master#3c1e777c24e695b2d0fa98320613ee9a19b0010e"
+source = "git+https://github.com/Zondax/ledger-rs?branch=master#b8b72b9ba8be6d8912b3ed44bdcd48ed9c96e64d"
 
 [[package]]
 name = "ledger-crypto"
@@ -973,7 +973,7 @@ dependencies = [
 [[package]]
 name = "ledger-transport"
 version = "0.7.0"
-source = "git+https://github.com/Zondax/ledger-rs?branch=master#3c1e777c24e695b2d0fa98320613ee9a19b0010e"
+source = "git+https://github.com/Zondax/ledger-rs?branch=master#b8b72b9ba8be6d8912b3ed44bdcd48ed9c96e64d"
 dependencies = [
  "byteorder",
  "futures",
@@ -992,7 +992,7 @@ dependencies = [
 [[package]]
 name = "ledger-transport-hid"
 version = "0.7.0"
-source = "git+https://github.com/Zondax/ledger-rs?branch=master#3c1e777c24e695b2d0fa98320613ee9a19b0010e"
+source = "git+https://github.com/Zondax/ledger-rs?branch=master#b8b72b9ba8be6d8912b3ed44bdcd48ed9c96e64d"
 dependencies = [
  "byteorder",
  "cfg-if 0.1.10",
@@ -1009,7 +1009,7 @@ dependencies = [
 [[package]]
 name = "ledger-transport-zemu"
 version = "0.7.0"
-source = "git+https://github.com/Zondax/ledger-rs?branch=master#3c1e777c24e695b2d0fa98320613ee9a19b0010e"
+source = "git+https://github.com/Zondax/ledger-rs?branch=master#b8b72b9ba8be6d8912b3ed44bdcd48ed9c96e64d"
 dependencies = [
  "glob",
  "grpc",
@@ -1027,7 +1027,7 @@ dependencies = [
 [[package]]
 name = "ledger-zondax-generic"
 version = "0.7.0"
-source = "git+https://github.com/Zondax/ledger-rs?branch=master#3c1e777c24e695b2d0fa98320613ee9a19b0010e"
+source = "git+https://github.com/Zondax/ledger-rs?branch=master#b8b72b9ba8be6d8912b3ed44bdcd48ed9c96e64d"
 dependencies = [
  "ledger-apdu",
  "ledger-transport",
@@ -2162,18 +2162,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.22"
+version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e9ae34b84616eedaaf1e9dd6026dbe00dcafa92aa0c8077cb69df1fcfe5e53e"
+checksum = "76cc616c6abf8c8928e2fdcc0dbfab37175edd8fb49a4641066ad1364fdab146"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.22"
+version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ba20f23e85b10754cd195504aebf6a27e2e6cbe28c17778a0c930724628dd56"
+checksum = "9be73a2caec27583d0046ef3796c3794f868a5bc813db689eed00c7631275cd1"
 dependencies = [
  "proc-macro2",
  "quote",
