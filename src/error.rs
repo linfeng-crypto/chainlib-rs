@@ -18,6 +18,7 @@ pub enum Error {
     #[error("ledger error: {0}")]
     LedgerError(String),
 
+    #[cfg(feature = "grpc")]
     #[error("prost encode error")]
     ProstEncodeError(#[from] prost::EncodeError),
 

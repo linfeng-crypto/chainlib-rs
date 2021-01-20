@@ -62,7 +62,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
           override: true
-      - run: cargo build --target ${{ matrix.target }} --release
+      - run: cargo build --target ${{ matrix.target }} --release --all-features
 
   test:
     runs-on: ubuntu-latest
