@@ -1,3 +1,4 @@
+#[cfg(feature = "ledger")]
 pub mod ledger_service;
 pub mod private_key_service;
 

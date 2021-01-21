@@ -1,6 +1,7 @@
+use crate::ledger_app::CryptoApp;
+use crate::ledger_app::PubkeyAddress;
 use async_trait::async_trait;
-use ledger_crypto::Address;
-use ledger_crypto::{APDUTransport, CryptoApp};
+use ledger_transport::APDUTransport;
 use secp256k1::PublicKey as InnerPublicKey;
 use std::sync::Arc;
 use zx_bip44::BIP44Path;
@@ -8,17 +9,6 @@ use zx_bip44::BIP44Path;
 use crate::error::Error;
 use crate::key_service::KeyService;
 use crate::types::key::PublicKey;
-
-/// block to wait for the async result
-#[macro_export]
-macro_rules! sync {
-    ($f:expr) => {{
-        let mut run_time = Runtime::new().unwrap();
-        run_time
-            .block_on($f)
-            .map_err(|e| Error::LedgerError(format!("{:?}", e)))
-    }};
-}
 
 /// Hedger Service
 #[derive(Clone)]
@@ -30,7 +20,7 @@ pub struct LedgerServiceHID {
     /// crypto app of ledger
     pub app: Arc<CryptoApp>,
     /// public key and address
-    pubkey_address: Address,
+    pubkey_address: PubkeyAddress,
     /// confirmation on ledger or not
     pub require_confirmation: bool,
 }
@@ -86,7 +76,7 @@ impl LedgerServiceHID {
 
         // get public key and address
         let pubkey_address = app
-            .get_address(&acc_address_prefix, &path, false)
+            .get_pubkey_address(&acc_address_prefix, &path, false)
             .await
             .map_err(|e| Error::LedgerError(format!("get address failed: {:?}", e)))?;
 

@@ -1,9 +1,9 @@
 use crate::error::Error;
 use crate::key_service::KeyService;
 use crate::types::basic::{Amount, Fee, SyncMode};
+use crate::types::signature::SignDoc;
 use crate::types::signature::Signature;
 use crate::types::transaction::{Transaction, Tx};
-use crate::utils::codec::serde_to_str;
 use serde::Serialize;
 
 #[derive(Clone)]
@@ -16,18 +16,6 @@ pub struct TxBuilder<T: KeyService + Clone, M: Serialize + Clone> {
     pub sequence: u64,
     pub fee: Option<Amount>,
     pub gas: Option<u64>,
-}
-
-#[derive(Serialize, Debug, Clone)]
-struct SignMsg<M: Serialize> {
-    #[serde(serialize_with = "serde_to_str")]
-    pub account_number: u64,
-    #[serde(serialize_with = "serde_to_str")]
-    pub sequence: u64,
-    pub chain_id: String,
-    pub memo: String,
-    pub fee: Fee,
-    pub msgs: Vec<M>,
 }
 
 impl<T, M> TxBuilder<T, M>
@@ -85,7 +73,7 @@ where
 
     async fn sign(&mut self) -> Result<Signature, Error> {
         let fee = self.get_fee();
-        let sign_msg = SignMsg {
+        let sign_doc = SignDoc {
             account_number: self.account_number,
             sequence: self.sequence,
             chain_id: self.chain_id.clone(),
@@ -93,12 +81,8 @@ where
             fee,
             msgs: self.messages.clone(),
         };
-        let value =
-            serde_json::to_value(&sign_msg).map_err(|e| Error::SerializeError(e.to_string()))?;
-        let sign_str = sorted_json::to_json(&value)
-            .replace("\n", "")
-            .replace(" ", "");
-        let signature = self.key_service.sign(sign_str.as_bytes()).await?;
+        let raw_doc = sign_doc.encode()?;
+        let signature = self.key_service.sign(&raw_doc).await?;
         let public_key = self.key_service.public_key()?;
 
         let signature = Signature {
